@@ -431,7 +431,7 @@ plt.xlabel('SBP(mmHg)') # 가로축 의미 설명
 # plt.ylabel('빈도') # 세로축 의미 설명
 plt.ylabel('frequency') # 세로축 의미 설명(빈도)
 plt.tight_layout() # 글자가 잘리지 않게 자동 정렬
-plt.show()
+# plt.show()
 
 plt.figure() # 그래프 공간 생성
 plt.hist(df['DBP(이완기)'], bins=8) # 구간 설정
@@ -439,6 +439,116 @@ plt.title('DBP DIST') # 그래프 위 제목 (이완기 혈압(DBP) 분포)
 plt.xlabel('DBP(mmHg)') # 가로축 의미 설명
 plt.ylabel('frequency') # 세로축 의미 설명(빈도)
 plt.tight_layout() # 글자가 잘리지 않게 자동 정렬
-plt.show()
+# plt.show()
 
 # 5-2) 혈압분류별 평균 SBP 막대그래프
+plt.close('all')
+bp_sbp_mean = df.groupby('혈압분류')['SBP(수축기)'].mean().sort_values(ascending=False)
+
+plt.figure()
+plt.bar(bp_sbp_mean.index, bp_sbp_mean.values)
+plt.title('Avg SBP by Blood Category')
+plt.xlabel('Blood Pressure Category')
+plt.ylabel('Average SBP(mmHg)')
+plt.tight_layout()
+# plt.show()
+
+# 5-3) 산점도 : BMI vs SBP
+plt.close('all')
+'''
+산점도 : 두 개의 숫자 변수 관계를 점(dot)으로 표현한 그래프
+'''
+plt.figure()
+plt.scatter(df['BMI'], df['SBP(수축기)'])
+plt.title('BMI vs SBP Scatter plot')
+plt.xlabel('BMI')
+plt.ylabel('SBP(mmHg)')
+plt.tight_layout()
+# plt.show()
+
+# 5-4) 측정일 기준 SBP 추이(날짜별 평균)
+plt.close('all')
+
+date_sbp = df.groupby('측정일')['SBP(수축기)'].mean()
+plt.figure()
+plt.plot(date_sbp.index, date_sbp.values) # 선 그래프 생성
+plt.title('Avg SBP Over Time') # 측정일별 평균 SBP 추이
+plt.xlabel('measurement date')
+plt.ylabel('Avg SBP(mmHg)')
+plt.xticks(rotation=30) # x출 눈금 글자 30도 회전
+plt.tight_layout()
+# plt.show()
+
+# 5-5) BMI분류 인원 수(파이차트)
+plt.close('all')
+
+bmi_count = df['BMI분류'].value_counts()
+
+plt.figure()
+plt.pie(
+    bmi_count.values,
+    labels=bmi_count.index,
+    autopct='%1.1f%%'
+)
+plt.title('BMI Category DIST')
+plt.tight_layout()
+# plt.show()
+
+# 5-6) 혈압분류별 BMI 분포(박스플롯)
+'''
+박스 플롯
+ - 평균이 아니라 '분포'보여줌
+ - 이상치 확인 가능
+'''
+plt.close('all')
+plt.figure()
+df.boxplot(column='BMI', by='혈압분류')
+plt.title('BMI DIST by Blood Category')
+plt.suptitle('') # 자동으로 생성되는 상단 제목 제거
+plt.xlabel('Blood Pressure Category')
+plt.ylabel('BMI')
+plt.tight_layout()
+# plt.show()
+
+# 5-7) 성별 BMI
+plt.close('all')
+plt.figure()
+
+df[df['성별'] == 'M']['BMI'].hist(alpha=0.5, bins=8)
+df[df['성별'] == 'F']['BMI'].hist(alpha=0.5, bins=8)
+
+
+plt.title('BMI DIST by Gender')
+plt.xlabel('BMI')
+plt.ylabel('Frequency')
+plt.legend(['Male', 'Female']) # 범례 표시
+plt.tight_layout()
+# plt.show()
+
+# 5-8) 상관관계 히트맵
+plt.close('all')
+'''
+히트맵
+ - 값의 크기를 색으로 표현하는 그래프
+ - 값이 클수록 진한 색
+ - 값이 작을수록 연한 색
+'''
+corr_cols = [
+    '나이', 
+    '키_cm', 
+    '몸무게_kg', 
+    'SBP(수축기)', 
+    'DBP(이완기)', 
+    '공복혈당', 
+    'BMI'
+]
+corr = df[corr_cols].corr()
+
+plt.figure()
+plt.imshow(corr)
+plt.colorbar()
+plt.xticks(range(len(corr_cols)), corr_cols, rotation=45)
+plt.yticks(range(len(corr_cols)), corr_cols, rotation=45)
+plt.title('Correlation Heatmap')
+plt.tight_layout()
+plt.show()
