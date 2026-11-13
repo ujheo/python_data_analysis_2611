@@ -327,3 +327,78 @@ cross = pd.crosstab(df['성별'], df['혈압분류'])
 
 print("\n[성별 + 혈압분류 교차 표]")
 print(cross)
+
+# 4-8) 비율 분석
+'''
+개수보다 비율이 중요할 때가 맣음
+ - 전체 주에서 각 혈압분류가 몇 %(백분율)인지 확인
+'''
+# value_counts() : 각 항목이 몇 번 나왔는지 세는 함수
+# normalize=True를 넣으면 개수가 아니라 비율로 바꿔줌
+# ex) 정상: 3/5 = 0.6
+# * 100은 비율이 보통 0~1사이 소수로 나오기 때문에 쉽게 %로 바꾸기 위해
+bp_ratio = df['혈압분류'].value_counts(normalize=True)*100
+
+print("\n[혈압분류 비율 (%)]")
+print(bp_ratio.round(1))
+
+# 4-9) 상위 N명 분석(Top 분석)
+'''
+특정 기준에서 상위 데이터 확인
+ - BMI 높은 사람 상위 3명
+ - 위험군 빠르게 파악 가능
+'''
+# nlargest() : 데이터에서 값이 가장 큰 상위 N개를 뽑는 함수
+top3_bmi = df.nlargest(3, 'BMI')
+
+print("\n[BMI 상위 3명]")
+print(top3_bmi[['환자ID', 'BMI', 'BMI분류']])
+
+# 4-10) 조건 + 그룹 분석
+'''
+특정 조건을 만족하는 데이터만 따로 분석
+ - 고혈압2기 환자만 따로 모아서 성별 평균 비교
+'''
+
+ht_df = df[df['혈압분류'] == '고혈압2기']
+ht_mean = ht_df.groupby('성별')[['BMI', '공복혈당']].mean()
+
+print("\n[고혈압2기 환자 - 성별 평균]")
+print(ht_mean)
+
+# 4-11) 순위(Rank) 만들기
+'''
+데이터에 순서를 부여
+ - BMI 기준 순위 작성
+'''
+# rank() : 데이터에 순위를 매기는 함수
+# ascending=True는 작은 값부터 1등으로 순위를 부여함
+df['BMI순위'] = df['BMI'].rank(ascending=True)
+
+print("\n[BMI 순위](환자ID 기준 순서)")
+print(df[['환자ID', 'BMI', 'BMI순위']])
+
+# BMI 순위별로 출력
+print("\n[BMI 순위](BMI순위 기준 순서)")
+df_sorted = df.sort_values('BMI순위')
+print(df_sorted[['환자ID', 'BMI', 'BMI순위']])
+
+# 4-11) 위험 점수 만들기
+'''
+조건을 점수화해서 위험도를 표현
+
+조건:
+ - 고혈압2기
+ - 공복혈당 >= 126
+ - BMI >= 25
+ - 각 조건마다 1점
+'''
+
+df['위험점수'] = (
+    (df['혈압분류'] == '고혈압2기').astype(int) +
+    (df['공복혈당'] >= 126).astype(int) +
+    (df['BMI'] >= 25).astype(int)
+)
+
+print("\n[위험점수]")
+print(df[['환자ID', '위험점수']])
