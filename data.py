@@ -383,7 +383,7 @@ print("\n[BMI 순위](BMI순위 기준 순서)")
 df_sorted = df.sort_values('BMI순위')
 print(df_sorted[['환자ID', 'BMI', 'BMI순위']])
 
-# 4-11) 위험 점수 만들기
+# 4-12) 위험 점수 만들기
 '''
 조건을 점수화해서 위험도를 표현
 
@@ -402,3 +402,43 @@ df['위험점수'] = (
 
 print("\n[위험점수]")
 print(df[['환자ID', '위험점수']])
+
+#====================================
+# [5] 시각화
+#====================================
+print("===================================")
+print("[5] 시각화")
+print("====================================")
+
+# 5-1) 혈압(SBP/DBP) 분포 히스토그램
+'''
+히스토그램
+ - 숫자 데이터가 어느 구간에 얼마나 많이 모여 있는지 보여주는 그래프
+ - bin이 크면 클 수록 나뉘는 구간이 촘촘함
+ - 구간 수에 따라 그래프 모양이 달라짐
+'''
+# # Linux 한글 폰트 설정
+# plt.rcParams['font.family'] = 'NanumGothic'
+
+# # 음수 기호 깨짐 방지
+# plt.rcParams['axes.unicode_minus'] = False
+
+plt.figure() # 그래프 공간 생성
+plt.hist(df['SBP(수축기)'], bins=8) # 구간 설정
+# plt.title('수축기 혈압(SBP) 분포') # 그래프 위 제목
+plt.title('SBP DIST') # 그래프 위 제목 (수축기 혈압(SBP) 분포)
+plt.xlabel('SBP(mmHg)') # 가로축 의미 설명
+# plt.ylabel('빈도') # 세로축 의미 설명
+plt.ylabel('frequency') # 세로축 의미 설명(빈도)
+plt.tight_layout() # 글자가 잘리지 않게 자동 정렬
+plt.show()
+
+plt.figure() # 그래프 공간 생성
+plt.hist(df['DBP(이완기)'], bins=8) # 구간 설정
+plt.title('DBP DIST') # 그래프 위 제목 (이완기 혈압(DBP) 분포)
+plt.xlabel('DBP(mmHg)') # 가로축 의미 설명
+plt.ylabel('frequency') # 세로축 의미 설명(빈도)
+plt.tight_layout() # 글자가 잘리지 않게 자동 정렬
+plt.show()
+
+# 5-2) 혈압분류별 평균 SBP 막대그래프
